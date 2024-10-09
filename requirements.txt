@@ -1,0 +1,10 @@
+gTTS==2.5.3
+jieba==0.42.1
+pypinyin==0.53.0
+streamlit==1.39.0
+extra-streamlit-components==0.1.71
+langchain==0.3.2
+openai==1.51.0
+python-dotenv==1.0.1
+pydantic==2.9.2
+SQLAlchemy==2.0.35
