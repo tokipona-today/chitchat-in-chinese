@@ -18,7 +18,7 @@ from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 MAX_MESSAGES = 15  # Limit the number of messages to keep in history -
 
 # Custom font file path
-FONT_FILE = '/Users/nikos/PycharmProjects/chinese_ollama/Hanzi-Pinyin-Font.top.ttf'
+FONT_FILE = 'Hanzi-Pinyin-Font.top.ttf'
 
 # Tone colors
 TONE_COLORS = {
