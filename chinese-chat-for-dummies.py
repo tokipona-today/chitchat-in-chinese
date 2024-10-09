@@ -15,7 +15,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 
 # Constants
-MAX_MESSAGES = 15  # Limit the number of messages to keep in history
+MAX_MESSAGES = 15  # Limit the number of messages to keep in history -
 
 # Custom font file path
 FONT_FILE = '/Users/nikos/PycharmProjects/chinese_ollama/Hanzi-Pinyin-Font.top.ttf'
