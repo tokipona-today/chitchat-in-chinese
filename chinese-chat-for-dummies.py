@@ -330,13 +330,17 @@ def main():
             font-family: sans-serif;
             font-size: 24px;
             line-height: 1.5;
-            display: flex;
+            display: block;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            max-width: 100%;
             align-items: center;
             transform: translateY(-17px);
         }}
         .normal-text span {{
-            display: inline-block;
-            vertical-align: middle;
+            display: inline;
+            vertical-align: baseline;
+            margin-right: 1px; 
         }}
         .stButton > button {{
             background-color: transparent !important;
