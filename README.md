@@ -1,4 +1,4 @@
-# chitchat-in-chinese
+# Chinese for Dummies
 Learn Chinese with a cute bot
 
 ![Chinese Chat for Dummies Screenshot](image.png)
