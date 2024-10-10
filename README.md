@@ -3,7 +3,7 @@ Learn Chinese with a cute bot
 
 ![Chinese Chat for Dummies Screenshot](image.png)
 
-Chinese Chat for Dummies is an interactive language learning application that provides a unique and engaging way to practice Chinese conversation skills. This app uses advanced AI to simulate conversations with a Chinese speaker, allowing users to improve their language abilities in a fun and dynamic environment.
+Chinese Chat for Dummies is an interactive language learning application that provides new way to practice Chinese conversation skills. This app uses advanced AI to simulate conversations with a Chinese speaker, allowing users to improve their language abilities in a fun and dynamic environment.
 
 ## Features
 
@@ -12,6 +12,9 @@ Chinese Chat for Dummies is an interactive language learning application that pr
 - **Pinyin Display**: Toggle Pinyin for easier pronunciation understanding.
 - **Text-to-Speech**: Listen to the correct pronunciation of Chinese phrases.
 - **Colorized Tones**: Visual representation of Chinese tones for better tone recognition.
+
+## Try It Out!
+You can use the app directly here: https://chitchat-in-chinese.streamlit.app/
 
 ## Getting Started
 
