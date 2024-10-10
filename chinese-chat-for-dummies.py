@@ -15,10 +15,10 @@ from langchain.chat_models import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 
 # Constants
-MAX_MESSAGES = 15  # Limit the number of messages to keep in history -
+MAX_MESSAGES = 15  # Limit the number of messages to keep in history
 
 # Custom font file path
-FONT_FILE = 'Hanzi-Pinyin-Font.top.ttf'
+FONT_FILE = '/Users/nikos/PycharmProjects/chinese_ollama/Hanzi-Pinyin-Font.top.ttf'
 
 # Tone colors
 TONE_COLORS = {
@@ -165,33 +165,22 @@ def extract_json(text: str) -> str:
 def get_translation(content: str, target_lang: str, api_key: str) -> Dict[str, str]:
     try:
         chatgpt = init_chatgpt(api_key)
-        translation_prompt = f"""For the following Chinese text, please provide:
-        1. The {target_lang} translation
+        translation_prompt = f"""Translate the following Chinese text to {target_lang}:
 
-        Chinese text: {content}
+        {content}
 
-        Please format your response as a JSON object with key '{target_lang.lower()}'.
-        Ensure that your entire response is a valid JSON object."""
+        Respond with only the translated text, without any additional formatting or explanation."""
 
         translation_response = chatgpt([HumanMessage(content=translation_prompt)]).content
-        st.write(f"Raw translation response: {translation_response}")  # Debug output
 
-        json_str = extract_json(translation_response)
-        if json_str:
-            translation_data = json.loads(json_str)
-            st.write(f"Parsed translation data: {translation_data}")  # Debug output
-            return translation_data
-        else:
-            st.error("No valid JSON found in the translation response")
-            return {target_lang.lower(): "Error: No valid JSON in response"}
+        # Nettoyage de la réponse
+        translation_response = translation_response.strip().strip('"')
 
-    except json.JSONDecodeError as e:
-        st.error(f"Error parsing translation data: {str(e)}")
-        return {target_lang.lower(): f"Error: JSON parse error - {str(e)}"}
+        return {target_lang.lower(): translation_response}
+
     except Exception as e:
         st.error(f"Unexpected error in translation: {str(e)}")
         return {target_lang.lower(): f"Error: Unexpected translation error - {str(e)}"}
-
 
 def get_tone_color(pinyin):
     for char in pinyin:
@@ -266,6 +255,13 @@ def display_message(content: str, role: str, translation_cache: Dict[str, Dict[s
         if st.session_state.get(f"show_translation_{message_index}", False):
             translation = translation_cache.get(content, {})
             translated_text = translation.get(st.session_state.target_lang.lower(), "Translation not available")
+
+            # Vérifiez si la traduction est un dictionnaire JSON
+            if isinstance(translated_text, dict) and st.session_state.target_lang.lower() in translated_text:
+                translated_text = translated_text[st.session_state.target_lang.lower()]
+
+            translated_text = translated_text.strip('"')
+
             st.markdown(f'> {translated_text}', unsafe_allow_html=True)
             if translated_text.startswith("Error:"):
                 st.error(f"Translation error: {translated_text}")
