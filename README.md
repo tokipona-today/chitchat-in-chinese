@@ -45,7 +45,7 @@ You can use the app directly here: https://chitchat-in-chinese.streamlit.app/
 3. Start chatting in Chinese!
 4. Use the Pinyin, Translate, and Listen buttons to aid your understanding.
 
-## How to create an Openai API key?
+### How to create an Openai API key?
 
 Watch this --} https://www.youtube.com/watch?v=gBSh9JI28UQ
 
