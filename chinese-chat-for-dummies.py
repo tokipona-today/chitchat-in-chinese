@@ -13,6 +13,7 @@ import extra_streamlit_components as stx
 import time
 from langchain.chat_models import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langchain_community.chat_models import ChatOpenAI
 
 # Constants
 MAX_MESSAGES = 15  # Limit the number of messages to keep in history
