@@ -251,19 +251,22 @@ def main():
     os.environ['LANG'] = 'en_US.UTF-8'
     os.environ['LC_ALL'] = 'en_US.UTF-8'
 
+    # Initialize all session state variables
+    initialize_session_state()
+
     # Load and apply custom font
     with open(FONT_FILE, "rb") as f:
         font_bytes = f.read()
     font_base64 = base64.b64encode(font_bytes).decode()
 
-    # Apply custom CSS (Keep your existing CSS here)
+    # Apply custom CSS
     st.markdown(f"""
         <style>
         @font-face {{
             font-family: 'CustomChineseFont';
             src: url(data:font/ttf;base64,{font_base64}) format('truetype');
         }}
-        /* Rest of your CSS styles */
+        /* Your CSS styles here */
         </style>
         """, unsafe_allow_html=True)
 
@@ -272,7 +275,18 @@ def main():
     characteristics = cookie_manager.get(cookie="teacher_characteristics") or {
         "mockery_flattery": 0.5,
         "emotional_expression": 0.5,
-        # Add other characteristics...
+        "formality": 0.5,
+        "patience": 0.5,
+        "humor": 0.5,
+        "teaching_style": 0.5,
+        "language_complexity": 0.5,
+        "cultural_references": 0.5,
+        "correction_frequency": 0.5,
+        "encouragement": 0.5,
+        "roleplay": 0.5,
+        "digression": 0.5,
+        "answer_length": 0.5,
+        "sarcasm": 0.5
     }
 
     # Convert all characteristics to float
@@ -280,9 +294,10 @@ def main():
 
     # Sidebar setup
     with st.sidebar:
-        st.session_state.student_name = st.text_input("Your Name", value="Mojo", key="student_name_input")
+        st.session_state.student_name = st.text_input("Your Name", value=st.session_state.student_name, key="student_name_input")
+        
         # Add your sidebar controls here...
-
+        
         api_key_cookie = cookie_manager.get(cookie="openai_api_key")
         if api_key_cookie:
             st.session_state.openai_api_key = api_key_cookie
@@ -299,7 +314,7 @@ def main():
     chatgpt = init_chatgpt(st.session_state.openai_api_key)
 
     # Initialize or reset chat
-    if "messages" not in st.session_state or st.session_state.get("reset_chat", False):
+    if len(st.session_state.messages) == 0 or st.session_state.reset_chat:
         initial_prompt = get_initial_prompt(st.session_state.student_name, **characteristics)
         st.session_state.messages = [{"role": "system", "content": initial_prompt}]
         st.session_state.reset_chat = False
@@ -323,187 +338,25 @@ def main():
     with input_container:
         user_input = st.chat_input("Your message:", key="user_input")
 
-    # Continuing from the previous if user_input block in main()
-        if user_input:
-            user_input_encoded = user_input.encode('utf-8').decode('utf-8')
-            st.session_state.messages.append({"role": "user", "content": user_input_encoded})
+    if user_input:
+        # Process user input
+        user_input_encoded = user_input.encode('utf-8').decode('utf-8')
+        st.session_state.messages.append({"role": "user", "content": user_input_encoded})
 
-            # Reinforce the persona and behavior
-            reinforcement_prompt = f"""記住，你是一個真實的中國人，不是AI。保持你的極端性格特徵，並根據以下設定調整你的行為：
+        # Get chat response and update messages
+        messages = create_messages_for_chat(st.session_state.messages, st.session_state.student_name, characteristics)
+        response = get_chat_response(messages, chatgpt)
+        response_sanitized = sanitize_output(response)
+        st.session_state.messages.append({"role": "assistant", "content": response_sanitized})
+        st.session_state.new_message = True
+        st.rerun()
 
-            {', '.join(f'{k}：{v:.1f}' for k, v in characteristics.items())}
-
-            只有在被明確要求時才教授中文。專注於進行有趣的對話，而不是教學。"""
-
-            messages = [
-                SystemMessage(content=get_initial_prompt(st.session_state.student_name, **characteristics)),
-                SystemMessage(content=reinforcement_prompt)
-            ] + [
-                HumanMessage(content=m["content"]) if m["role"] == "user" else
-                AIMessage(content=m["content"]) if m["role"] == "assistant" else
-                SystemMessage(content=m["content"])
-                for m in st.session_state.messages[-MAX_MESSAGES:] if m["role"] != "system"
-            ]
-
-            # Get chat response with proper encoding handling
-            response = get_chat_response(messages, chatgpt)
-            response_sanitized = sanitize_output(response)
-            st.session_state.messages.append({"role": "assistant", "content": response_sanitized})
-            st.session_state.new_message = True
+    # Reset Chat button in sidebar
+    with st.sidebar:
+        if st.button("Reset Chat", key="reset_chat_button"):
+            st.session_state.reset_chat = True
+            st.session_state.translation_cache = {}
             st.rerun()
 
-        if st.session_state.new_message:
-            st.session_state.new_message = False
-
-        # Reset Chat button in sidebar
-        with st.sidebar:
-            if st.button("Reset Chat", key="reset_chat_button"):
-                st.session_state.reset_chat = True
-                st.session_state.translation_cache = {}
-                st.rerun()
-
 if __name__ == "__main__":
-    # Add CSS for proper text rendering
-    st.markdown("""
-        <style>
-        /* Base styles */
-        .stApp {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-        }
-        
-        /* Message styling */
-        .stChatMessage {
-            background-color: transparent !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-        
-        .stChatMessage [data-testid="chatAvatarIcon-user"], 
-        .stChatMessage [data-testid="chatAvatarIcon-assistant"] {
-            display: none;
-        }
-        
-        .stChatMessage [data-testid="chatMessage-user"] > div:first-child, 
-        .stChatMessage [data-testid="chatMessage-assistant"] > div:first-child {
-            background-color: transparent !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-        
-        /* Text styling */
-        .user-message {
-            font-size: 1.2em;
-            font-weight: light;
-            color: #F9F9F9;
-            margin-bottom: 10px;
-        }
-        
-        .pinyin-text {
-            font-family: 'CustomChineseFont', sans-serif;
-            font-size: 32px;
-            transform: translateY(-28px);
-        }
-        
-        .normal-text {
-            font-family: sans-serif;
-            font-size: 24px;
-            line-height: 1.5;
-            display: block;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            max-width: 100%;
-            align-items: center;
-            transform: translateY(-17px);
-        }
-        
-        .normal-text span {
-            display: inline;
-            vertical-align: baseline;
-            margin-right: 1px; 
-        }
-        
-        /* Button styling */
-        .stButton > button {
-            background-color: transparent !important;
-            color: #f9f9f9 !important;
-            border: none !important;
-            text-align: left;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0 !important;
-            height: auto;
-            line-height: 1;
-            box-shadow: none !important;
-            font-weight: normal !important;
-            margin: 0 !important;
-            min-width: 0 !important;
-        }
-        
-        .stButton > button:hover {
-            color: #ffffff !important;
-            background-color: transparent !important;
-            text-decoration: underline;
-        }
-        
-        /* Layout styling */
-        .row-widget.stHorizontal {
-            flex-direction: row;
-            justify-content: flex-start;
-            gap: 10px;
-        }
-        
-        .row-widget.stHorizontal > div {
-            flex: 0 1 auto;
-        }
-        
-        /* Markdown and text elements */
-        .stMarkdown, .stMarkdown p {
-            color: #f9f9f9 !important;
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-            color: #f9f9f9 !important;
-        }
-        
-        .element-container {
-            background-color: transparent !important;
-        }
-        
-        /* Sidebar styling */
-        [data-testid="stSidebar"] {
-            background-color: #f0f0f0;
-        }
-        
-        [data-testid="stSidebar"] .stMarkdown,
-        [data-testid="stSidebar"] .stMarkdown p,
-        [data-testid="stSidebar"] .stSelectbox,
-        [data-testid="stSidebar"] .stSlider,
-        [data-testid="stSidebar"] .stTextInput {
-            color: black !important;
-        }
-        
-        [data-testid="stSidebar"] .stMarkdown h1 {
-            color: black !important;
-        }
-        
-        [data-testid="stSidebar"] .stButton > button {
-            color: black !important;
-            background-color: #e0e0e0 !important;
-            border: 1px solid #c0c0c0 !important;
-            border-radius: 4px;
-            padding: 5px 10px !important;
-            text-align: center;
-            font-weight: bold !important;
-        }
-        
-        [data-testid="stSidebar"] .stButton > button:hover {
-            background-color: #d0d0d0 !important;
-            color: black !important;
-            text-decoration: none;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    
     main()
