@@ -30,6 +30,32 @@ TONE_COLORS = {
     5: "#F9F9F9"  # Neutral tone
 }
 
+def initialize_session_state():
+    """Initialize all session state variables"""
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    if "new_message" not in st.session_state:
+        st.session_state.new_message = False
+    
+    if "reset_chat" not in st.session_state:
+        st.session_state.reset_chat = False
+    
+    if "translation_cache" not in st.session_state:
+        st.session_state.translation_cache = {}
+    
+    if "previous_target_lang" not in st.session_state:
+        st.session_state.previous_target_lang = None
+    
+    if "target_lang" not in st.session_state:
+        st.session_state.target_lang = "English"
+    
+    if "student_name" not in st.session_state:
+        st.session_state.student_name = "Mojo"
+    
+    if "openai_api_key" not in st.session_state:
+        st.session_state.openai_api_key = None
+        
 def get_audio_html(file_path: str) -> str:
     with open(file_path, "rb") as audio_file:
         audio_bytes = audio_file.read()
