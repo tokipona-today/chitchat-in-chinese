@@ -15,6 +15,8 @@ from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_community.chat_models import ChatOpenAI
 import httpx
 
+st.set_page_config(page_title="Chinese Chat for Dummies", page_icon="🇹🇼", layout="wide")
+
 # Constants
 MAX_MESSAGES = 15
 FONT_FILE = 'Hanzi-Pinyin-Font.top.ttf'
@@ -222,8 +224,6 @@ def main():
     os.environ['PYTHONIOENCODING'] = 'utf-8'
     os.environ['LANG'] = 'en_US.UTF-8'
     os.environ['LC_ALL'] = 'en_US.UTF-8'
-    
-    st.set_page_config(page_title="Chinese Chat for Dummies", page_icon="🇹🇼", layout="wide")
 
     # Load and apply custom font
     with open(FONT_FILE, "rb") as f:
